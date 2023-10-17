@@ -1,6 +1,6 @@
+using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using TodoRedis.Services;
-using TodoRedis.Services.Caching;
 
 namespace TodoRedis.Controllers
 {
@@ -18,20 +18,31 @@ namespace TodoRedis.Controllers
         [HttpGet]
         public async Task<IActionResult> GetTodosAsync()
         {
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
             var todos = await _service.GetTodosAsync();
-            return Ok(todos);
+            stopwatch.Stop();
+            TimeSpan ts = stopwatch.Elapsed;
+            
+            return Ok(new{duration = new {milliseconds = ts.Microseconds, seconds = ts.Seconds}, todos});
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetTodoAsync(int id)
         {
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
+
             var todo = await _service.GetTodoAsync(id);
             if (todo is null)
             {
                 return NotFound();
             }
 
-            return Ok(todo);
+            stopwatch.Stop();
+            TimeSpan ts = stopwatch.Elapsed;
+
+            return Ok(new{duration = new {milliseconds = ts.Microseconds, seconds = ts.Seconds}, todo});
         }
 
         [HttpPost]

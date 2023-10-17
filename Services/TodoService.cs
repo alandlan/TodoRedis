@@ -28,6 +28,7 @@ namespace TodoRedis.Services
 
             if (list is null)
             {
+                Thread.Sleep(TimeSpan.FromSeconds(1));
                 list = await _context.Todos.ToListAsync();
                 _cachingService.SetAsync("todos", list);
             }
@@ -41,6 +42,7 @@ namespace TodoRedis.Services
 
             if (todo is null)
             {
+                Thread.Sleep(TimeSpan.FromSeconds(1));
                 todo = await _context.Todos.FindAsync(id);
                 _cachingService.SetAsync(id.ToString(), todo);
             }
