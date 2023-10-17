@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using TodoRedis.Data;
+using TodoRedis.Helpers;
 using TodoRedis.Models;
 using TodoRedis.Services.Caching;
 
@@ -23,14 +24,15 @@ namespace TodoRedis.Services
 
         public async Task<IEnumerable<Todo>> GetTodosAsync()
         {
+            var key = RedisName.GetObjectKey<Todo>("all");
 
-            var list = await _cachingService.GetListAsync<Todo>("todos");
+            var list = await _cachingService.GetListAsync<Todo>(key);
 
             if (list is null)
             {
                 Thread.Sleep(TimeSpan.FromSeconds(1));
                 list = await _context.Todos.ToListAsync();
-                _cachingService.SetAsync("todos", list);
+                await _cachingService.SetAsync(key, list);
             }
 
             return list;
@@ -38,13 +40,15 @@ namespace TodoRedis.Services
 
         public async Task<Todo> GetTodoAsync(int id)
         {
-            var todo = await _cachingService.GetAsync<Todo>(id.ToString());
+            var key = RedisName.GetObjectKey<Todo>(id.ToString());
+
+            var todo = await _cachingService.GetAsync<Todo>(key);
 
             if (todo is null)
             {
                 Thread.Sleep(TimeSpan.FromSeconds(1));
                 todo = await _context.Todos.FindAsync(id);
-                _cachingService.SetAsync(id.ToString(), todo);
+                await _cachingService.SetAsync(key, todo);
             }
 
             return todo;
