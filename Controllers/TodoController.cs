@@ -51,5 +51,22 @@ namespace TodoRedis.Controllers
             var createdTodo = await _service.CreateTodoAsync(todo);
             return Created($"/api/todo/{createdTodo.Id}", createdTodo);
         }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateTodoAsync(int id, [FromBody] TodoRedis.Models.Todo todo)
+        {
+            var existingTodo = await _service.GetTodoAsync(id);
+            if (existingTodo is null)
+            {
+                return NotFound();
+            }
+
+            existingTodo.Descricao = todo.Descricao;
+            existingTodo.Concluida = todo.Concluida;
+
+            await _service.UpdateTodoAsync(existingTodo);
+
+            return NoContent();
+        }
     }
 }

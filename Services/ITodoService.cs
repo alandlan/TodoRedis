@@ -7,5 +7,6 @@ namespace TodoRedis.Services
         Task<IEnumerable<Todo>> GetTodosAsync();
         Task<Todo> GetTodoAsync(int id);
         Task<Todo> CreateTodoAsync(Todo todo);
+        Task UpdateTodoAsync(Todo todo);
     }
 }

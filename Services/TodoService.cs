@@ -60,5 +60,13 @@ namespace TodoRedis.Services
             await _context.SaveChangesAsync();
             return todo;
         }
+
+        public async Task UpdateTodoAsync(Todo todo){
+            _context.Entry(todo).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+
+            var key = RedisName.GetObjectKey<Todo>(todo.Id.ToString());
+            await _cachingService.SetAsync(key, todo);
+        }
     }
 }
